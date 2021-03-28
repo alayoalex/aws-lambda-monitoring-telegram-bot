@@ -4,25 +4,25 @@ from queue import Queue
 
 import cherrypy
 import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Dispatcher
+from telegram.ext import CommandHandler, MessageHandler, Filters, Dispatcher
 
 
-class SimpleWebsite(object):
+class SimpleWebsite:
     @cherrypy.expose
     def index(self):
         return """<H1>Welcome!</H1>"""
 
 
-class BotComm(object):
+class BotComm:
     exposed = True
 
     def __init__(self, TOKEN, NAME):
-        super(BotComm, self).__init__()
+        super().__init__()
         self.TOKEN = TOKEN
-        self.NAME=NAME
+        self.NAME = NAME
         self.bot = telegram.Bot(self.TOKEN)
         try:
-            self.bot.setWebhook("https://{}.herokuapp.com/{}".format(self.NAME, self.TOKEN))
+            self.bot.set_webhook(f"https://{self.NAME}.herokuapp.com/{self.TOKEN}")
         except:
             raise RuntimeError("Failed to set the webhook")
 
@@ -30,8 +30,7 @@ class BotComm(object):
         self.dp = Dispatcher(self.bot, self.update_queue)
 
         self.dp.add_handler(CommandHandler("start", self._start))
-        self.dp.add_handler(MessageHandler(Filters.text, self._echo))
-        self.dp.add_error_handler(self._error)
+        self.dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self._echo))
 
     @cherrypy.tools.json_in()
     def POST(self, *args, **kwargs):
@@ -39,14 +38,11 @@ class BotComm(object):
         update = telegram.Update.de_json(update, self.bot)
         self.dp.process_update(update)
 
-    def _error(self, error):
-        cherrypy.log("Error occurred - {}".format(error))
-
-    def _start(self, bot, update):
+    def _start(self, update, context):
         update.effective_message.reply_text("Hi!")
 
 
-    def _echo(self, bot, update):
+    def _echo(self, update, context):
         update.effective_message.reply_text(update.effective_message.text)
 
 

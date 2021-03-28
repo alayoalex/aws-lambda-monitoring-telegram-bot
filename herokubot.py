@@ -4,15 +4,12 @@ import os
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
-def start(bot, update):
+def start(update, context):
     update.effective_message.reply_text("Hi!")
 
 
-def echo(bot, update):
+def echo(update, context):
     update.effective_message.reply_text(update.effective_message.text)
-
-def error(bot, update, error):
-    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 if __name__ == "__main__":
@@ -33,12 +30,11 @@ if __name__ == "__main__":
     dp = updater.dispatcher
     # Add handlers
     dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(MessageHandler(Filters.text, echo))
-    dp.add_error_handler(error)
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Start the webhook
     updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
-                          url_path=TOKEN)
-    updater.bot.setWebhook("https://{}.herokuapp.com/{}".format(NAME, TOKEN))
+                          url_path=TOKEN,
+                          webhook_url=f"https://{NAME}.herokuapp.com/{TOKEN}")
     updater.idle()

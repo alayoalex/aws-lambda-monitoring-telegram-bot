@@ -2,11 +2,12 @@
 
 So you want to deploy a python-telegram-bot on Heroku?
 
-In this repository you'll find a skeleton for an app on Heroku using the python-telegram-bot library.
+In this repository you'll find a skeleton for an app on Heroku using the `python-telegram-bot` library.
 
 Things to read/know:
+* This skeleton requires `python-telegram-bot>=13.4`, which also means that you need to run it on Python>=3.5.
 * [Heroku getting started with Python](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
-* [Heroku CLI](https://devcenter.heroku.com/categories/command-line) - Not required but very usefull
+* [Heroku CLI](https://devcenter.heroku.com/categories/command-line) - Not required but very useful
 * Basic knowledge with git
 
 Things you need:
