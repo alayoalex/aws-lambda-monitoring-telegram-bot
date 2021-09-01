@@ -14,7 +14,7 @@ def echo(update, context):
 
 if __name__ == "__main__":
     # Set these variable to the appropriate values
-    TOKEN = "bot1692535363:AAGDJzQlPMf-h7HU0lpEonxnYQlb3JCfG8I"
+    TOKEN = "1692535363:AAGDJzQlPMf-h7HU0lpEonxnYQlb3JCfG8I"
     NAME = "mizpa-telegram-bot"
 
     # Port is given by Heroku
