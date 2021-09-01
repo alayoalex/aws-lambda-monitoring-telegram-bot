@@ -22,7 +22,8 @@ class BotComm:
         self.NAME = NAME
         self.bot = telegram.Bot(self.TOKEN)
         try:
-            self.bot.set_webhook(f"https://{self.NAME}.herokuapp.com/{self.TOKEN}")
+            self.bot.set_webhook(
+                f"https://{self.NAME}.herokuapp.com/{self.TOKEN}")
         except:
             raise RuntimeError("Failed to set the webhook")
 
@@ -30,7 +31,8 @@ class BotComm:
         self.dp = Dispatcher(self.bot, self.update_queue)
 
         self.dp.add_handler(CommandHandler("start", self._start))
-        self.dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self._echo))
+        self.dp.add_handler(MessageHandler(
+            Filters.text & ~Filters.command, self._echo))
 
     @cherrypy.tools.json_in()
     def POST(self, *args, **kwargs):
@@ -41,15 +43,14 @@ class BotComm:
     def _start(self, update, context):
         update.effective_message.reply_text("Hi!")
 
-
     def _echo(self, update, context):
         update.effective_message.reply_text(update.effective_message.text)
 
 
 if __name__ == "__main__":
     # Set these variable to the appropriate values
-    TOKEN = "Your token from @Botfather"
-    NAME = "The name of your app on Heroku"
+    TOKEN = "bot1692535363:AAGDJzQlPMf-h7HU0lpEonxnYQlb3JCfG8I"
+    NAME = "mizpa-telegram-bot"
 
     # Port is given by Heroku
     PORT = os.environ.get('PORT')
