@@ -15,6 +15,7 @@ session = boto3.Session(aws_access_key_id=aws_access_key_id,
                         aws_secret_access_key=aws_secret_access_key,
                         region_name=region)
 logs_client = session.client('logs')
+lambda_client = session.client('lambda')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,3 +51,19 @@ def list_logs_events(log_group_name):
                          error.response['Error']['Code'])
         logger.exception(error.response['Error']['Message'])
         raise error
+
+
+def list_lambda_functions():
+    try:
+        paginator = lambda_client.get_paginator('list_functions')
+        lambda_list = []
+        for response in paginator.paginate(PaginationConfig={
+            'MaxItems': 300,
+            'PageSize': 20
+        }):
+            for l in response.get('Functions', []):
+                lambda_list.append(l)
+        return lambda_list
+    except ClientError as error:
+        logger.exception("There was an error: %s.", error)
+        raise

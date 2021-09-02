@@ -15,10 +15,8 @@ def start(update, context):
 
 
 def logs(update, context):
-    print(context.args)
     response = json.dumps(awslogs.list_logs_events(
         "/aws/lambda/{}".format(context.args[0])), indent=4)
-    # fres = utils.format_response(response)
     if len(response) > 4096:
         for x in range(0, len(response), 4096):
             context.bot.send_message(
@@ -26,6 +24,13 @@ def logs(update, context):
     else:
         context.bot.send_message(
             chat_id=update.effective_chat.id, text=response)
+
+
+def ld(update, context):
+    lambdas = awslogs.list_lambda_functions()
+    for l in lambdas:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text=l['FunctionName'])
 
 
 def unknown(update, context):
