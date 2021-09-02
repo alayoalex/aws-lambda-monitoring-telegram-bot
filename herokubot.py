@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # Add handlers
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('logs', logs))
-    # dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    dp.add_handler(CommandHandler('ld', ld))
     dp.add_handler(MessageHandler(Filters.command, unknown))
 
     # Start the webhook
