@@ -10,22 +10,27 @@ def start(update, context):
     update.effective_message.reply_text("Hi!")
 
 
-def echo(update, context):
-    update.effective_message.reply_text(update.effective_message.text)
+# def echo(update, context):
+#     update.effective_message.reply_text(update.effective_message.text)
 
 
 def logs(update, context):
     print(context.args)
-    response = awslogs.list_logs_events(
-        "/aws/lambda/{}".format(context.args[0]))
+    response = json.dumps(awslogs.list_logs_events(
+        "/aws/lambda/{}".format(context.args[0])), indent=4)
     # fres = utils.format_response(response)
     if len(response) > 4096:
         for x in range(0, len(response), 4096):
             context.bot.send_message(
-                chat_id=update.effective_chat.id, text=json.dumps(response[x:x+4096], indent=4))
+                chat_id=update.effective_chat.id, text=response[x:x+4096])
     else:
         context.bot.send_message(
-            chat_id=update.effective_chat.id, text=json.dumps(response, indent=4))
+            chat_id=update.effective_chat.id, text=response)
+
+
+def unknown(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="Sorry, I didn't understand that command.")
 
 
 if __name__ == "__main__":
@@ -48,7 +53,8 @@ if __name__ == "__main__":
     # Add handlers
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('logs', logs))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    # dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    dp.add_handler(MessageHandler(Filters.command, unknown))
 
     # Start the webhook
     updater.start_webhook(listen="0.0.0.0",
