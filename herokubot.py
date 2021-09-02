@@ -19,9 +19,13 @@ def logs(update, context):
     response = awslogs.list_logs_events(
         "/aws/lambda/{}".format(context.args[0]))
     # fres = utils.format_response(response)
-    for x in range(0, len(response), 4096):
+    if len(response) > 4096:
+        for x in range(0, len(response), 4096):
+            context.bot.send_message(
+                chat_id=update.effective_chat.id, text=response[x:x+4096])
+    else:
         context.bot.send_message(
-            chat_id=update.effective_chat.id, text=response[x:x+4096])
+            chat_id=update.effective_chat.id, text=response)
 
 
 if __name__ == "__main__":
