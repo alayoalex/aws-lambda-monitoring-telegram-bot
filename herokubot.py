@@ -1,6 +1,6 @@
 import logging
 import os
-
+import awslogs
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
@@ -10,6 +10,12 @@ def start(update, context):
 
 def echo(update, context):
     update.effective_message.reply_text(update.effective_message.text)
+
+
+def logs(update, context):
+    response = awslogs.list_logs_events(
+        "/aws/lambda/{}".format(update.effective_message.text))
+    update.effective_message.reply_text(response)
 
 
 if __name__ == "__main__":
