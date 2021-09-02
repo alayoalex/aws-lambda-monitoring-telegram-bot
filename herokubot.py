@@ -13,9 +13,11 @@ def echo(update, context):
 
 
 def logs(update, context):
-    response = awslogs.list_logs_events(
-        "/aws/lambda/{}".format(update.effective_message.text))
-    update.effective_message.reply_text(response)
+    text_caps = ' '.join(context.args).upper()
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
+    # response = awslogs.list_logs_events(
+    #     "/aws/lambda/{}".format(update.effective_message.text))
+    # update.effective_message.reply_text(response)
 
 
 if __name__ == "__main__":
@@ -34,8 +36,10 @@ if __name__ == "__main__":
     # Set up the Updater
     updater = Updater(TOKEN)
     dp = updater.dispatcher
+
     # Add handlers
     dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('logs', logs))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Start the webhook
