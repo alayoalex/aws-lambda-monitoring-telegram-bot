@@ -67,3 +67,10 @@ def list_lambda_functions():
     except ClientError as error:
         logger.exception("There was an error: %s.", error)
         raise
+
+
+def get_lambda_info(lambda_name):
+    lambda_list = list_lambda_functions()
+    for l in lambda_list:
+        if l['FunctionName'] == lambda_name:
+            return l

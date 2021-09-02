@@ -27,17 +27,23 @@ def logs(update, context):
 
 
 def ld(update, context):
-    lambdas = awslogs.list_lambda_functions()
-    text = "There are {} lambda functions in us-east-2 region.".format(
-        len(lambdas))
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text=text)
-    names = []
-    for l in lambdas:
-        names.append(l['FunctionName'])
-    names_str = "\n".join(names)
-    context.bot.send_message(
-        chat_id=update.effective_chat.id, text=str(names_str))
+    if not bool(context.args):
+        lambdas = awslogs.list_lambda_functions()
+        text = "There are {} lambda functions in us-east-2 region.".format(
+            len(lambdas))
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text=text)
+        names = []
+        for l in lambdas:
+            names.append(l['FunctionName'])
+        names_str = "\n".join(names)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text=str(names_str))
+    elif context.args:
+        lambda_f = json.dumps(
+            awslogs.get_lambda_info(context.args[0]), indent=4)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text=lambda_f)
 
 
 def unknown(update, context):
