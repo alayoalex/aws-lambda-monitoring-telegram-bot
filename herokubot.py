@@ -13,12 +13,12 @@ def echo(update, context):
 
 
 def logs(update, context):
-    text_caps = ' '.join(context.args).upper()
+    # text_caps = ' '.join(context.args).upper()
     print(context.args)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
-    # response = awslogs.list_logs_events(
-    #     "/aws/lambda/{}".format(update.effective_message.text))
+    response = awslogs.list_logs_events(
+        "/aws/lambda/{}".format(context.args[0]))
     # update.effective_message.reply_text(response)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=response)
 
 
 if __name__ == "__main__":
