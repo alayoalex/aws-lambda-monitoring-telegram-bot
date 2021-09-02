@@ -28,9 +28,12 @@ def logs(update, context):
 
 def ld(update, context):
     lambdas = awslogs.list_lambda_functions()
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="There are {} lambda functions.".format(len(lambdas)))
+    names = []
     for l in lambdas:
-        context.bot.send_message(
-            chat_id=update.effective_chat.id, text=l['FunctionName'])
+        names.append(l['FunctionName'])
+    context.bot.send_message(chat_id=update.effective_chat.id, text=str(names))
 
 
 def unknown(update, context):
