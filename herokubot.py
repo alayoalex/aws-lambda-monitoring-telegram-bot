@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 import awslogs
 import utils
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -21,10 +22,10 @@ def logs(update, context):
     if len(response) > 4096:
         for x in range(0, len(response), 4096):
             context.bot.send_message(
-                chat_id=update.effective_chat.id, text=response[x:x+4096])
+                chat_id=update.effective_chat.id, text=json.dumps(response[x:x+4096], indent=4))
     else:
         context.bot.send_message(
-            chat_id=update.effective_chat.id, text=response)
+            chat_id=update.effective_chat.id, text=json.dumps(response, indent=4))
 
 
 if __name__ == "__main__":
