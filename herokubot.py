@@ -14,7 +14,6 @@ def echo(update, context):
 
 
 def logs(update, context):
-    # text_caps = ' '.join(context.args).upper()
     print(context.args)
     response = awslogs.list_logs_events(
         "/aws/lambda/{}".format(context.args[0]))
