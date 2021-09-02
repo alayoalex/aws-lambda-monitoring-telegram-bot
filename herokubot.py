@@ -1,6 +1,7 @@
 import logging
 import os
 import awslogs
+import utils
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
@@ -17,8 +18,10 @@ def logs(update, context):
     print(context.args)
     response = awslogs.list_logs_events(
         "/aws/lambda/{}".format(context.args[0]))
-    # update.effective_message.reply_text(response)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response)
+    # fres = utils.format_response(response)
+    for x in range(0, len(response), 4096):
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text=response[x:x+4096])
 
 
 if __name__ == "__main__":
