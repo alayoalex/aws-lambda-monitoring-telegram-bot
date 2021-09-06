@@ -6,6 +6,13 @@ import utils
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
+aws_access_key_id = os.environ['aws_access_key_id']
+aws_secret_access_key = os.environ['aws_secret_access_key']
+region = os.environ['region']
+
+regions = ['us-east-1', 'us-east-2']
+
+
 def start(update, context):
     update.effective_message.reply_text("Hi!")
 
@@ -15,7 +22,9 @@ def start(update, context):
 
 
 def logs(update, context):
-    response = json.dumps(awslogs.list_logs_events(
+    aws_logs = awslogs.AWS_Services(
+        aws_secret_access_key, aws_secret_access_key, region)
+    response = json.dumps(aws_logs.list_logs_events(
         "/aws/lambda/{}".format(context.args[0])), indent=4)
     if len(response) > 4096:
         for x in range(0, len(response), 4096):
@@ -27,8 +36,25 @@ def logs(update, context):
 
 
 def ld(update, context):
-    if not bool(context.args):
-        lambdas = awslogs.list_lambda_functions()
+    """
+    Commands
+    /ld: get all function names, default region us-east-2
+    /ld [region]: get all function names of a specific region 
+    /ld [function_name]: get a function metadata, default region us-east-2
+    /ld [region] [function_name]: get a function metadata of a specific region
+    """
+    if len(context.args) > 0:
+        if context.args[0].split('=')[0] == 'region':
+            aws_logs = awslogs.AWS_Services(
+                aws_secret_access_key, aws_secret_access_key, context.args[0].split('=')[1])
+        else:
+            aws_logs = awslogs.AWS_Services(
+                aws_secret_access_key, aws_secret_access_key, region)
+
+    if len(context.args) == 0:
+        aws_logs = awslogs.AWS_Services(
+            aws_secret_access_key, aws_secret_access_key, region)
+        lambdas = aws_logs.list_lambda_functions()
         text = "There are {} lambda functions in us-east-2 region.".format(
             len(lambdas))
         context.bot.send_message(chat_id=update.effective_chat.id,
@@ -39,9 +65,14 @@ def ld(update, context):
         names_str = "\n".join(names)
         context.bot.send_message(
             chat_id=update.effective_chat.id, text=str(names_str))
-    elif context.args:
+    elif len(context.args) == 1:
         lambda_f = json.dumps(
-            awslogs.get_lambda_info(context.args[0]), indent=4)
+            aws_logs.get_lambda_info(context.args[0]), indent=4)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text=lambda_f)
+    elif len(context.args) == 2:
+        lambda_f = json.dumps(
+            aws_logs.get_lambda_info(context.args[1]), indent=4)
         context.bot.send_message(
             chat_id=update.effective_chat.id, text=lambda_f)
 
@@ -53,11 +84,10 @@ def unknown(update, context):
 
 if __name__ == "__main__":
     # Set these variable to the appropriate values
-    TOKEN = "1692535363:AAGDJzQlPMf-h7HU0lpEonxnYQlb3JCfG8I"
-    NAME = "mizpa-telegram-bot"
-
+    TOKEN = os.environ['TOKEN']
     # Port is given by Heroku
     PORT = os.environ.get('PORT')
+    NAME = "mizpa-telegram-bot"
 
     # Enable logging
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
