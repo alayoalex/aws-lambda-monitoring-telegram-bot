@@ -23,7 +23,7 @@ def list_log_streams(logs_client, log_group_name):
 
 
 def list_logs_events(logs_client, log_group_name):
-    logs_streams = list_log_streams(log_group_name)['logStreams']
+    logs_streams = list_log_streams(logs_client, log_group_name)['logStreams']
     try:
         response = logs_client.get_log_events(
             logGroupName=log_group_name,
