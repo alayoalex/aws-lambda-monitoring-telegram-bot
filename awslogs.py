@@ -25,12 +25,15 @@ def list_log_streams(logs_client, log_group_name):
 def list_logs_events(logs_client, log_group_name):
     logs_streams = list_log_streams(logs_client, log_group_name)['logStreams']
     try:
-        response = logs_client.get_log_events(
-            logGroupName=log_group_name,
-            logStreamName=logs_streams[0]['logStreamName'],
-            startFromHead=False
-        )
-        return response
+        if len(logs_streams) > 0:
+            response = logs_client.get_log_events(
+                logGroupName=log_group_name,
+                logStreamName=logs_streams[0]['logStreamName'],
+                startFromHead=False
+            )
+            return response
+        else:
+            return {'status': 404, 'message': 'There was not logs streams for this group name'}
     except botocore.exceptions.ClientError as error:
         logger.exception("There was an error: %s",
                          error.response['Error']['Code'])
