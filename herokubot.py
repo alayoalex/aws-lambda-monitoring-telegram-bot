@@ -22,17 +22,34 @@ def start(update, context):
 
 
 def logs(update, context):
-    aws_logs = awslogs.AWS_Services(
-        aws_secret_access_key, aws_secret_access_key, region)
-    response = json.dumps(aws_logs.list_logs_events(
-        "/aws/lambda/{}".format(context.args[0])), indent=4)
-    if len(response) > 4096:
-        for x in range(0, len(response), 4096):
+    if len(context.args) == 1:
+        aws_logs = awslogs.AWS_Services(
+            aws_secret_access_key, aws_secret_access_key, region)
+        response = json.dumps(aws_logs.list_logs_events(
+            "/aws/lambda/{}".format(context.args[0])), indent=4)
+        if len(response) > 4096:
+            for x in range(0, len(response), 4096):
+                context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=response[x:x+4096])
+        else:
             context.bot.send_message(
-                chat_id=update.effective_chat.id, text=response[x:x+4096])
+                chat_id=update.effective_chat.id, text=response)
+    elif len(context.args) == 2:
+        aws_logs = awslogs.AWS_Services(
+            aws_secret_access_key, aws_secret_access_key, context.args[0])
+        response = json.dumps(aws_logs.list_logs_events(
+            "/aws/lambda/{}".format(context.args[1])), indent=4)
+        if len(response) > 4096:
+            for x in range(0, len(response), 4096):
+                context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=response[x:x+4096])
+        else:
+            context.bot.send_message(
+                chat_id=update.effective_chat.id, text=response)
     else:
+        message = 'Incorrect Command, please, check the bot help.'
         context.bot.send_message(
-            chat_id=update.effective_chat.id, text=response)
+            chat_id=update.effective_chat.id, text=message)
 
 
 def ld(update, context):
