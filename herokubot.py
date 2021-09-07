@@ -2,31 +2,30 @@ import logging
 import os
 import json
 import awslogs
-import utils
+# import utils
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import boto3
 
+
+regions = ['us-east-1', 'us-east-2']
 
 aws_access_key_id = os.environ['aws_access_key_id']
 aws_secret_access_key = os.environ['aws_secret_access_key']
 region = os.environ['region']
-
-regions = ['us-east-1', 'us-east-2']
 
 
 def start(update, context):
     update.effective_message.reply_text("Hi!")
 
 
-# def echo(update, context):
-#     update.effective_message.reply_text(update.effective_message.text)
-
-
 def logs(update, context):
     if len(context.args) == 1:
-        aws_logs = awslogs.AWS_Services(
-            aws_secret_access_key, aws_secret_access_key, region)
-        response = json.dumps(aws_logs.list_logs_events(
-            "/aws/lambda/{}".format(context.args[0])), indent=4)
+        session = boto3.Session(aws_access_key_id=aws_access_key_id,
+                                aws_secret_access_key=aws_secret_access_key,
+                                region_name=region)
+        logs_client = session.client('logs')
+        response = json.dumps(awslogs.list_logs_events(logs_client,
+                                                       "/aws/lambda/{}".format(context.args[0])), indent=4)
         if len(response) > 4096:
             for x in range(0, len(response), 4096):
                 context.bot.send_message(
@@ -35,10 +34,12 @@ def logs(update, context):
             context.bot.send_message(
                 chat_id=update.effective_chat.id, text=response)
     elif len(context.args) == 2:
-        aws_logs = awslogs.AWS_Services(
-            aws_secret_access_key, aws_secret_access_key, context.args[0])
-        response = json.dumps(aws_logs.list_logs_events(
-            "/aws/lambda/{}".format(context.args[1])), indent=4)
+        session = boto3.Session(aws_access_key_id=aws_access_key_id,
+                                aws_secret_access_key=aws_secret_access_key,
+                                region_name=context.args[0])
+        logs_client = session.client('logs')
+        response = json.dumps(awslogs.list_logs_events(logs_client,
+                                                       "/aws/lambda/{}".format(context.args[1])), indent=4)
         if len(response) > 4096:
             for x in range(0, len(response), 4096):
                 context.bot.send_message(
@@ -62,9 +63,11 @@ def ld(update, context):
     """
 
     if len(context.args) == 0:
-        aws_logs = awslogs.AWS_Services(
-            aws_secret_access_key, aws_secret_access_key, region)
-        lambdas = aws_logs.list_lambda_functions()
+        session = boto3.Session(aws_access_key_id=aws_access_key_id,
+                                aws_secret_access_key=aws_secret_access_key,
+                                region_name=region)
+        lambda_client = session.client('lambda')
+        lambdas = awslogs.list_lambda_functions(lambda_client)
         text = "There are {} lambda functions in us-east-2 region.".format(
             len(lambdas))
         context.bot.send_message(chat_id=update.effective_chat.id,
@@ -77,9 +80,11 @@ def ld(update, context):
             chat_id=update.effective_chat.id, text=str(names_str))
     elif len(context.args) == 1:
         if context.args[0] in regions:
-            aws_logs = awslogs.AWS_Services(
-                aws_secret_access_key, aws_secret_access_key, context.args[0])
-            lambdas = aws_logs.list_lambda_functions()
+            session = boto3.Session(aws_access_key_id=aws_access_key_id,
+                                    aws_secret_access_key=aws_secret_access_key,
+                                    region_name=context.args[0])
+            lambda_client = session.client('lambda')
+            lambdas = awslogs.list_lambda_functions(lambda_client)
             text = "There are {} lambda functions in {} region.".format(
                 context.args[0], len(lambdas))
             context.bot.send_message(chat_id=update.effective_chat.id,
@@ -91,18 +96,22 @@ def ld(update, context):
             context.bot.send_message(
                 chat_id=update.effective_chat.id, text=str(names_str))
         else:
-            aws_logs = awslogs.AWS_Services(
-                aws_secret_access_key, aws_secret_access_key, region)
+            session = boto3.Session(aws_access_key_id=aws_access_key_id,
+                                    aws_secret_access_key=aws_secret_access_key,
+                                    region_name=region)
+            lambda_client = session.client('lambda')
             lambda_f = json.dumps(
-                aws_logs.get_lambda_info(context.args[0]), indent=4)
+                awslogs.get_lambda_info(lambda_client, context.args[0]), indent=4)
             context.bot.send_message(
                 chat_id=update.effective_chat.id, text=lambda_f)
     elif len(context.args) == 2:
         if context.args[0] in regions:
-            aws_logs = awslogs.AWS_Services(
-                aws_secret_access_key, aws_secret_access_key, context.args[0])
+            session = boto3.Session(aws_access_key_id=aws_access_key_id,
+                                    aws_secret_access_key=aws_secret_access_key,
+                                    region_name=context.args[0])
+            lambda_client = session.client('lambda')
             lambda_f = json.dumps(
-                aws_logs.get_lambda_info(context.args[1]), indent=4)
+                awslogs.get_lambda_info(lambda_client, context.args[1]), indent=4)
             context.bot.send_message(
                 chat_id=update.effective_chat.id, text=lambda_f)
         else:
