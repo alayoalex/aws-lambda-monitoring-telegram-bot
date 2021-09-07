@@ -86,7 +86,7 @@ def ld(update, context):
             lambda_client = session.client('lambda')
             lambdas = awslogs.list_lambda_functions(lambda_client)
             text = "There are {} lambda functions in {} region.".format(
-                context.args[0], len(lambdas))
+                len(lambdas), context.args[0])
             context.bot.send_message(chat_id=update.effective_chat.id,
                                      text=text)
             names = []
