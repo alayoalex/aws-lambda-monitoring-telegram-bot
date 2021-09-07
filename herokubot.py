@@ -19,6 +19,11 @@ def start(update, context):
 
 
 def logs(update, context):
+    """
+    Commands
+    /logs [function_name]: get a function logs, default region us-east-2
+    /logs [region] [function_name]: get a function logs of a specific region
+    """
     if len(context.args) == 1:
         session = boto3.Session(aws_access_key_id=aws_access_key_id,
                                 aws_secret_access_key=aws_secret_access_key,
