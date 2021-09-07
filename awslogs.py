@@ -1,4 +1,4 @@
-import botocore.exceptions as ClientError
+import botocore
 import boto3
 import logging
 from dotenv import load_dotenv
@@ -27,7 +27,7 @@ class AWS_Services:
                 limit=10
             )
             return response
-        except ClientError as error:
+        except botocore.exceptions.ClientError as error:
             logger.exception("There was an error: %s",
                              error.response['Error']['Code'])
             logger.exception(error.response['Error']['Message'])
@@ -42,7 +42,7 @@ class AWS_Services:
                 startFromHead=False
             )
             return response
-        except ClientError as error:
+        except botocore.exceptions.ClientError as error:
             logger.exception("There was an error: %s",
                              error.response['Error']['Code'])
             logger.exception(error.response['Error']['Message'])
@@ -59,7 +59,7 @@ class AWS_Services:
                 for l in response.get('Functions', []):
                     lambda_list.append(l)
             return lambda_list
-        except ClientError as error:
+        except botocore.exceptions.ClientError as error:
             logger.exception("There was an error: %s.", error)
             raise
 
