@@ -68,3 +68,4 @@ class AWS_Services:
         for l in lambda_list:
             if l['FunctionName'] == lambda_name:
                 return l
+        return 'This lambda function does not exist in this region: {}'.format(lambda_name)

@@ -43,13 +43,6 @@ def ld(update, context):
     /ld [function_name]: get a function metadata, default region us-east-2
     /ld [region] [function_name]: get a function metadata of a specific region
     """
-    if len(context.args) > 0:
-        if context.args[0].split('=')[0] == 'region':
-            aws_logs = awslogs.AWS_Services(
-                aws_secret_access_key, aws_secret_access_key, context.args[0].split('=')[1])
-        else:
-            aws_logs = awslogs.AWS_Services(
-                aws_secret_access_key, aws_secret_access_key, region)
 
     if len(context.args) == 0:
         aws_logs = awslogs.AWS_Services(
@@ -66,15 +59,43 @@ def ld(update, context):
         context.bot.send_message(
             chat_id=update.effective_chat.id, text=str(names_str))
     elif len(context.args) == 1:
-        lambda_f = json.dumps(
-            aws_logs.get_lambda_info(context.args[0]), indent=4)
-        context.bot.send_message(
-            chat_id=update.effective_chat.id, text=lambda_f)
+        if context.args[0] in regions:
+            aws_logs = awslogs.AWS_Services(
+                aws_secret_access_key, aws_secret_access_key, context.args[0])
+            lambdas = aws_logs.list_lambda_functions()
+            text = "There are {} lambda functions in {} region.".format(
+                context.args[0], len(lambdas))
+            context.bot.send_message(chat_id=update.effective_chat.id,
+                                     text=text)
+            names = []
+            for l in lambdas:
+                names.append(l['FunctionName'])
+            names_str = "\n".join(names)
+            context.bot.send_message(
+                chat_id=update.effective_chat.id, text=str(names_str))
+        else:
+            aws_logs = awslogs.AWS_Services(
+                aws_secret_access_key, aws_secret_access_key, region)
+            lambda_f = json.dumps(
+                aws_logs.get_lambda_info(context.args[0]), indent=4)
+            context.bot.send_message(
+                chat_id=update.effective_chat.id, text=lambda_f)
     elif len(context.args) == 2:
-        lambda_f = json.dumps(
-            aws_logs.get_lambda_info(context.args[1]), indent=4)
+        if context.args[0] in regions:
+            aws_logs = awslogs.AWS_Services(
+                aws_secret_access_key, aws_secret_access_key, context.args[0])
+            lambda_f = json.dumps(
+                aws_logs.get_lambda_info(context.args[1]), indent=4)
+            context.bot.send_message(
+                chat_id=update.effective_chat.id, text=lambda_f)
+        else:
+            message = 'This region does not exist: {}'.format(context.args[0])
+            context.bot.send_message(
+                chat_id=update.effective_chat.id, text=message)
+    else:
+        message = 'Incorrect Command, please, check the bot help.'
         context.bot.send_message(
-            chat_id=update.effective_chat.id, text=lambda_f)
+            chat_id=update.effective_chat.id, text=message)
 
 
 def unknown(update, context):
