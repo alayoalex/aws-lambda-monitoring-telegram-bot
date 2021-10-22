@@ -138,14 +138,20 @@ def help_command(update, context):
     """Displays info on how to use the bot."""
     update.message.reply_text(
         """
-        Use /start to test this bot. \n\n 
-        Commands \n
-        /ld: get all function names, default region us-east-2 \n
-        /ld [region]: get all function names of a specific region \n
-        /ld [function_name]: get a function metadata, default region us-east-2 \n
-        /ld [region] [function_name]: get a function metadata of a specific region \n
-        /logs [function_name]: get a function logs, default region us-east-2 \n
-        /logs [region] [function_name]: get a function logs of a specific region
+        Commands
+        /start to test and awake this bot
+        /help to view commands
+        /ld: get all function names, default region us-east-2
+        /ld [region]: get all function names of a specific region
+        /ld [function_name]: get a function metadata, default region us-east-2
+        /ld [region] [function_name]: get a function metadata of a specific region
+        /logs [function_name]: get a function logs, default region us-east-2
+        /logs [region] [function_name]: get a function logs of a specific region \n
+        Examples:
+        /ld hello-world-function
+        /ld us-east-1 hello-world-function
+        /logs hello-world-function
+        /logs us-east-1 hello-world-function
         """
     )
 
